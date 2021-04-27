@@ -19,36 +19,39 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Direct: "
+            android:text="PagingSource:"
             />
 
         <ToggleButton
             android:id="@+id/direct"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Direct"
+            />
+
+        <Space
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
             />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cached: "
+            android:text="RemoteMediator:"
             />
 
         <ToggleButton
             android:id="@+id/cached"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Cached"
             />
 
     </LinearLayout>
 
     <TextView
-        android:id="@+id/instructions"
+        android:id="@+id/info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="This is to illustrate the bugs we run into when using RemoteMediator that we don't see when going direct."
+        android:text="This is to illustrate the bugs we run into when using RemoteMediator that we don't see when going direct using a PagingSource."
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
