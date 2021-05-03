@@ -7,6 +7,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
+import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -49,7 +50,7 @@ class ContentMediator(private val db: AppDatabase, private val backend: ContentA
             val itemNumber = when (loadType) {
                 LoadType.REFRESH -> state.lastItemOrNull()?.cid ?: 1
                 LoadType.PREPEND -> (firstIndex - size).takeIf { it > 0 } ?: return MediatorResult.Success(endOfPaginationReached = true).also {
-                    Log.v("Mediator", "returned $it")
+                    Log.v("Mediator", "returned $it endOfPaginationReached true")
                 }
                 LoadType.APPEND -> lastIndex
             }
@@ -61,7 +62,7 @@ class ContentMediator(private val db: AppDatabase, private val backend: ContentA
                 lastIndex = nextNumber
             } else {
                 firstIndex = min(firstIndex, itemNumber)
-                lastIndex = min(lastIndex, nextNumber)
+                lastIndex = max(lastIndex, nextNumber)
             }
 
             db.withTransaction {
