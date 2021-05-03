@@ -7,6 +7,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
+import kotlin.math.min
 
 /**
  * Example of a direct paging source with no cache
@@ -38,16 +39,30 @@ class ContentSource(private val backend: ContentApi) : PagingSource<Int, Content
 @OptIn(ExperimentalPagingApi::class)
 class ContentMediator(private val db: AppDatabase, private val backend: ContentApi) : RemoteMediator<Int, Content>() {
 
+    private var firstIndex = 1
+    private var lastIndex = 1
+
     override suspend fun load(loadType: LoadType, state: PagingState<Int, Content>): MediatorResult {
         Log.v("Mediator", "load(type $loadType, state $state)")
         return try {
             val size = if (loadType == LoadType.REFRESH) state.config.initialLoadSize else state.config.pageSize
             val itemNumber = when (loadType) {
                 LoadType.REFRESH -> state.lastItemOrNull()?.cid ?: 1
-                LoadType.PREPEND -> state.firstItemOrNull()?.cid?.minus(size)?.takeIf { it > 0 } ?: return MediatorResult.Success(endOfPaginationReached = true)
-                LoadType.APPEND -> state.lastItemOrNull()?.cid ?: return MediatorResult.Success(endOfPaginationReached = true)
+                LoadType.PREPEND -> (firstIndex - size).takeIf { it > 0 } ?: return MediatorResult.Success(endOfPaginationReached = true).also {
+                    Log.v("Mediator", "returned $it")
+                }
+                LoadType.APPEND -> lastIndex
             }
             val response = backend.getContent(itemNumber, size)
+            Log.v("Mediator", "loaded $size items")
+            val nextNumber = itemNumber + response.items.size
+            if (loadType == LoadType.REFRESH) {
+                firstIndex = itemNumber
+                lastIndex = nextNumber
+            } else {
+                firstIndex = min(firstIndex, itemNumber)
+                lastIndex = min(lastIndex, nextNumber)
+            }
 
             db.withTransaction {
                 if (loadType == LoadType.REFRESH) {
@@ -56,9 +71,14 @@ class ContentMediator(private val db: AppDatabase, private val backend: ContentA
                 db.contentDao.insertAll(*response.items.toTypedArray())
             }
 
-            MediatorResult.Success(endOfPaginationReached = response.items.isEmpty())
+            val endOfPaginationReached = response.items.isEmpty()
+            MediatorResult.Success(endOfPaginationReached).also {
+                Log.v("Mediator", "returned $it, endOfPaginationReached $endOfPaginationReached")
+            }
         } catch (e: Exception) {
-            MediatorResult.Error(e)
+            MediatorResult.Error(e).also {
+                Log.v("Mediator", "returned $it")
+            }
         }
     }
 }

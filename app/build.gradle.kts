@@ -39,12 +39,12 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.activity:activity-ktx:1.2.2")
     implementation("androidx.paging:paging-runtime-ktx:3.0.0-rc01")
-    kapt("androidx.room:room-compiler:2.3.0-rc01")
-    implementation("androidx.room:room-ktx:2.3.0-rc01")
-    implementation("androidx.room:room-runtime:2.3.0-rc01")
+    kapt("androidx.room:room-compiler:2.3.0")
+    implementation("androidx.room:room-ktx:2.3.0")
+    implementation("androidx.room:room-runtime:2.3.0")
     implementation("com.google.android.material:material:1.3.0")
 
-    testImplementation("junit:junit:4.+")
+    testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.2")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.3.0")
 }
